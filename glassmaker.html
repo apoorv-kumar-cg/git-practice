@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RETRO GLASSMAKER // 8-BIT STUDIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0c1d;
+      --crt-border: #26243f;
+      --screen-bg: #151329;
+      --gold: #f6b93b;
+      --neon-cyan: #00f2fe;
+      --neon-pink: #ff2a7a;
+      --neon-green: #00ff88;
+      --flame-orange: #fa8231;
+      --charcoal: #1e1b38;
+      --pixel-border: #3b3765;
+      --text: #e0e0ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image: 
+        linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      color: var(--text);
+      font-family: 'Press Start 2P', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Retro Arcade Cabinet Container */
+    .arcade-cabinet {
+      width: 100%;
+      max-width: 820px;
+      background: var(--crt-border);
+      border: 4px solid #484377;
+      border-radius: 20px;
+      box-shadow: 0 0 35px rgba(0, 242, 254, 0.25), 0 25px 60px rgba(0, 0, 0, 0.9);
+      padding: 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Cabinet Marquee Header */
+    .marquee {
+      background: linear-gradient(90deg, #1b1836, #2d2857, #1b1836);
+      border: 3px solid #5a5494;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .marquee-title {
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-pink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fire-badge {
+      display: inline-block;
+      animation: flameWiggle 0.8s infinite alternate;
+    }
+
+    @keyframes flameWiggle {
+      0% { transform: scale(1) rotate(-4deg); }
+      100% { transform: scale(1.15) rotate(5deg); }
+    }
+
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.75rem;
+    }
+
+    .stat-coin {
+      color: var(--gold);
+      text-shadow: 0 0 8px rgba(246, 185, 59, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cabinet-btn {
+      background: #252243;
+      border: 2px solid #58518f;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cabinet-btn:hover {
+      background: #393466;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    }
+
+    .cabinet-btn:active {
+      transform: translateY(2px);
+    }
+
+    /* CRT Monitor Frame with Curved Glow */
+    .crt-screen-wrapper {
+      position: relative;
+      background: var(--screen-bg);
+      border: 4px solid #11101f;
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95);
+    }
+
+    /* CRT Scanlines Overlay */
+    .scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(
+        rgba(18, 16, 38, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.04),
+        rgba(0, 255, 0, 0.02),
+        rgba(0, 0, 255, 0.04)
+      );
+      background-size: 100% 4px, 6px 100%;
+      z-index: 10;
+      opacity: 0.85;
+      transition: opacity 0.3s;
+    }
+
+    .scanlines.off {
+      opacity: 0;
+    }
+
+    /* Screen Game Viewports */
+    .game-view {
+      flex: 1;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top Stage Stepper */
+    .stage-indicator {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px dashed #3a3560;
+      padding-bottom: 12px;
+      font-size: 0.65rem;
+    }
+
+    .stage-step {
+      color: #635d94;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .stage-step.active {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
+    }
+
+    .stage-step.done {
+      color: var(--neon-green);
+    }
+
+    /* Customer Order Banner */
+    .order-banner {
+      background: rgba(26, 23, 49, 0.85);
+      border: 2px solid #4a447c;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      line-height: 1.6;
+    }
+
+    .order-title {
+      color: var(--gold);
+    }
+
+    .order-reward {
+      color: var(--neon-green);
+      font-size: 0.75rem;
+    }
+
+    /* STAGE 1: RAW BATCH MIXING */
+    .batch-workbench {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .workbench-jars {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .jar-card {
+      background: #211e3b;
+      border: 3px solid #423c72;
+      border-radius: 10px;
+      padding: 12px;
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .jar-card:hover {
+      border-color: var(--neon-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0, 242, 254, 0.3);
+    }
+
+    .jar-card:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .jar-icon {
+      font-size: 2.2rem;
+    }
+
+    .jar-name {
+      font-size: 0.58rem;
+      text-align: center;
+      color: #fff;
+    }
+
+    .jar-count {
+      font-size: 0.6rem;
+      color: var(--neon-cyan);
+    }
+
+    .crucible-pot {
+      width: 280px;
+      background: #191730;
+      border: 3px solid #58518e;
+      border-radius: 0 0 35px 35px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: inset 0 0 20px #000;
+    }
+
+    .crucible-meter {
+      width: 100%;
+      height: 16px;
+      background: #100e20;
+      border: 2px solid #413b6e;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .crucible-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e0e0ff, #f6b93b);
+      transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* STAGE 2: FURNACE SMELTING */
+    .furnace-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .kiln-viewport {
+      width: 320px;
+      height: 180px;
+      background: radial-gradient(circle, #ff5e00 0%, #a82000 60%, #300800 100%);
+      border: 6px solid #5d2510;
+      border-radius: 40px 40px 10px 10px;
+      box-shadow: 0 0 40px rgba(255, 94, 0, 0.7), inset 0 0 30px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .molten-gob {
+      width: 60px;
+      height: 60px;
+      background: #fffb9b;
+      border-radius: 50%;
+      box-shadow: 0 0 30px #ffea00, 0 0 60px #ff5100;
+      animation: bubbleBoil 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes bubbleBoil {
+      0% { transform: scale(1) translateY(0); border-radius: 45% 55% 50% 50%; }
+      50% { transform: scale(1.1) translateY(-4px); border-radius: 55% 45% 48% 52%; }
+      100% { transform: scale(0.95) translateY(3px); border-radius: 50% 50% 55% 45%; }
+    }
+
+    .temp-gauge {
+      width: 300px;
+      height: 22px;
+      background: #1c1a33;
+      border: 3px solid #4a4478;
+      border-radius: 11px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .temp-target-zone {
+      position: absolute;
+      left: 65%;
+      width: 25%;
+      height: 100%;
+      background: rgba(0, 255, 136, 0.35);
+      border-left: 2px solid var(--neon-green);
+      border-right: 2px solid var(--neon-green);
+      z-index: 1;
+    }
+
+    .temp-fill {
+      height: 100%;
+      width: 10%;
+      background: linear-gradient(90deg, #3498db, #f39c12, #e74c3c);
+      transition: width 0.1s linear;
+    }
+
+    .temp-label {
+      font-size: 0.65rem;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      width: 300px;
+    }
+
+    .action-btn-large {
+      background: linear-gradient(180deg, #ff5e36, #cf2e00);
+      border: 3px solid #ff9270;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.75rem;
+      padding: 14px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #7e1e00, 0 10px 20px rgba(255, 94, 0, 0.4);
+      transition: all 0.1s;
+    }
+
+    .action-btn-large:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+    }
+
+    .action-btn-large:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #7e1e00;
+    }
+
+    /* STAGE 3: GLASSBLOWING CANVAS */
+    .blowing-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    #glassCanvas {
+      background: #0f0d20;
+      border: 3px solid #3c3766;
+      border-radius: 14px;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8);
+      display: block;
+      touch-action: none;
+    }
+
+    .blow-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .action-btn {
+      background: #2b274e;
+      border: 2px solid #574f96;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.62rem;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.12s;
+    }
+
+    .action-btn:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+    }
+
+    .action-btn:active, .action-btn.active {
+      background: var(--neon-cyan);
+      color: #000;
+      transform: translateY(2px);
+    }
+
+    .action-btn.blow {
+      background: linear-gradient(180deg, #00d2ff, #008cb3);
+      border-color: #70e6ff;
+      color: #000;
+      font-size: 0.7rem;
+      padding: 12px 22px;
+      box-shadow: 0 4px 0 #00566e;
+    }
+
+    .action-btn.blow:active, .action-btn.blow.active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #00566e;
+    }
+
+    /* STAGE 4: ANNEALING & RESULTS */
+    .result-arena {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .trophy-pedestal {
+      width: 140px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .glass-showcase-svg {
+      filter: drop-shadow(0 0 15px var(--neon-cyan));
+      animation: floatItem 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatItem {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .grade-badge {
+      font-size: 2.2rem;
+      color: var(--gold);
+      text-shadow: 0 0 15px rgba(246, 185, 59, 0.8);
+      animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .result-details {
+      background: #1f1b3b;
+      border: 2px solid #48417c;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 0.65rem;
+      line-height: 1.8;
+      width: 100%;
+      max-width: 380px;
+      text-align: left;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* GALLERY MODAL */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 9, 23, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      padding: 24px;
+      gap: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed #48417c;
+      padding-bottom: 12px;
+      font-size: 0.8rem;
+      color: var(--gold);
+    }
+
+    .gallery-grid {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .gallery-card {
+      background: #1d1a36;
+      border: 2px solid #3c3768;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.55rem;
+      text-align: center;
+    }
+
+    .gallery-card.locked {
+      opacity: 0.35;
+      filter: grayscale(1);
+    }
+
+    /* Bottom Control Instructions */
+    .footer-instructions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.55rem;
+      color: #7973aa;
+      padding: 0 6px;
+    }
+
+    .kbd {
+      background: #2d294f;
+      border: 1px solid #58518f;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="arcade-cabinet">
+    <!-- Marquee Top Header -->
+    <div class="marquee">
+      <div class="marquee-title">
+        <span class="fire-badge">🔥</span>
+        RETRO GLASSMAKER
+      </div>
+      <div class="stats-bar">
+        <div class="stat-coin">🪙 <span id="coinCount">0</span> G</div>
+        <button class="cabinet-btn" id="galleryBtn">🏆 GALLERY</button>
+        <button class="cabinet-btn" id="crtToggleBtn">CRT: ON</button>
+        <button class="cabinet-btn" id="soundToggleBtn">🔊</button>
+      </div>
+    </div>
+
+    <!-- Retro CRT Monitor Frame -->
+    <div class="crt-screen-wrapper">
+      <div class="scanlines" id="scanlines"></div>
+
+      <div class="game-view">
+        <!-- Stage Stepper -->
+        <div class="stage-indicator">
+          <div class="stage-step active" id="step1">1. BATCH</div>
+          <div class="stage-step" id="step2">2. SMELT</div>
+          <div class="stage-step" id="step3">3. BLOW & SHAPE</div>
+          <div class="stage-step" id="step4">4. ANNEAL</div>
+        </div>
+
+        <!-- Customer Order Card -->
+        <div class="order-banner" id="orderBanner">
+          <div>
+            <span class="order-title" id="orderCustomer">ALCHEMIST // ORDER #1</span><br>
+            <span id="orderDesc">Wants a Standard Clear Potion Flask</span>
+          </div>
+          <div class="order-reward" id="orderReward">+50 G</div>
+        </div>
+
+        <!-- STAGE 1: BATCH INGREDIENTS -->
+        <div class="batch-workbench" id="batchStage">
+          <p style="font-size: 0.65rem; color: #a59fcb; text-align: center;">
+            MEASURE RAW MINERALS INTO THE CRUCIBLE POT:
+          </p>
+          <div class="workbench-jars">
+            <div class="jar-card" data-mineral="silica">
+              <div class="jar-icon">⏳</div>
+              <div class="jar-name">SILICA SAND</div>
+              <div class="jar-count" id="countSilica">0 / 3</div>
+            </div>
+            <div class="jar-card" data-mineral="soda">
+              <div class="jar-icon">🧂</div>
+              <div class="jar-name">SODA ASH (FLUX)</div>
+              <div class="jar-count" id="countSoda">0 / 2</div>
+            </div>
+            <div class="jar-card" data-mineral="lime">
+              <div class="jar-icon">🪨</div>
+              <div class="jar-name">LIMESTONE</div>
+              <div class="jar-count" id="countLime">0 / 1</div>
+            </div>
+            <div class="jar-card" data-mineral="oxide">
+              <div class="jar-icon" id="oxideIcon">💎</div>
+              <div class="jar-name" id="oxideName">OXIDE TINT</div>
+              <div class="jar-count" id="countOxide">CLEAR</div>
+            </div>
+          </div>
+
+          <div class="crucible-pot">
+            <span style="font-size: 0.6rem; color: var(--gold);">CRUCIBLE BATCH</span>
+            <div class="crucible-meter">
+              <div class="crucible-fill" id="crucibleFill"></div>
+            </div>
+            <button class="action-btn" id="startSmeltBtn" style="display: none; margin-top: 6px;">
+              🔥 LOAD INTO FURNACE
+            </button>
+          </div>
+        </div>
+
+        <!-- STAGE 2: FURNACE SMELTING -->
+        <div class="furnace-arena" id="furnaceStage" style="display: none;">
+          <div class="kiln-viewport">
+            <div class="molten-gob" id="furnaceGob"></div>
+            <span style="position: absolute; bottom: 8px; font-size: 0.55rem; color: #ffeb99;" id="meltState">
+              HEATING UP...
+            </span>
+          </div>
+
+          <div class="temp-label">
+            <span>TEMP: <b id="tempReading">800°C</b></span>
+            <span style="color: var(--neon-green);">TARGET: 1400-1600°C</span>
+          </div>
+
+          <div class="temp-gauge">
+            <div class="temp-target-zone"></div>
+            <div class="temp-fill" id="tempFill"></div>
+          </div>
+
+          <button class="action-btn-large" id="bellowsBtn">
+            💨 PUMP BELLOWS [SPACE]
+          </button>
+        </div>
+
+        <!-- STAGE 3: GLASSBLOWING & SHAPING -->
+        <div class="blowing-arena" id="blowingStage" style="display: none;">
+          <canvas id="glassCanvas" width="500" height="250"></canvas>
+
+          <div class="blow-controls">
+            <button class="action-btn blow" id="blowBtn">💨 BLOW [HOLD SPACE]</button>
+            <button class="action-btn" id="shapeBaseBtn">📐 SHAPE BASE [S]</button>
+            <button class="action-btn" id="shapeNeckBtn">✂️ TAPER NECK [W]</button>
+            <button class="action-btn" id="finishShapeBtn" style="border-color: var(--neon-green); color: var(--neon-green);">
+              ✅ DONE SHAPING
+            </button>
+          </div>
+          <div style="font-size: 0.55rem; color: #8e88bd;">
+            FIT THE MOLTEN GLASS INTO THE DOTTED SILHOUETTE BEFORE IT COOLS!
+          </div>
+        </div>
+
+        <!-- STAGE 4: ANNEALING & RESULTS -->
+        <div class="result-arena" id="resultStage" style="display: none;">
+          <div class="grade-badge" id="gradeBadge">RANK S</div>
+          <div class="trophy-pedestal" id="resultPedestal">
+            <!-- Rendered Finished SVG Icon -->
+          </div>
+          <div class="result-details">
+            <div class="result-row"><span>CUSTOMER:</span><span id="resCustomer">ALCHEMIST</span></div>
+            <div class="result-row"><span>ITEM:</span><span id="resItem">POTION FLASK</span></div>
+            <div class="result-row"><span>SHAPE ACCURACY:</span><span id="resAccuracy" style="color:var(--neon-green);">95%</span></div>
+            <div class="result-row"><span>PURITY & ANNEAL:</span><span style="color:var(--neon-cyan);">FLAWLESS</span></div>
+            <div class="result-row" style="border-top: 1px dashed #48417c; margin-top: 4px; padding-top: 4px;">
+              <span>REWARD EARNED:</span><span id="resReward" style="color:var(--gold);">+50 G</span>
+            </div>
+          </div>
+          <button class="action-btn-large" id="nextOrderBtn">NEXT CUSTOMER ➔</button>
+        </div>
+
+      </div>
+
+      <!-- GALLERY MODAL -->
+      <div class="modal-overlay" id="galleryModal">
+        <div class="modal-header">
+          <span>🏆 MASTERPIECE TROPHY CABINET</span>
+          <button class="cabinet-btn" id="closeGalleryBtn">✕ CLOSE</button>
+        </div>
+        <div class="gallery-grid" id="galleryGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Cabinet Footer Instructions -->
+    <div class="footer-instructions">
+      <span>SHORTCUTS: <span class="kbd">SPACE</span> BLOW / PUMP | <span class="kbd">W</span> / <span class="kbd">S</span> SHAPE TOOLS</span>
+      <span>RETRO HARDWARE V1.0</span>
+    </div>
+  </div>
+
+  <script>
+    // --- Retro Chiptune Audio Synthesizer (Web Audio API) ---
+    let soundOn = true;
+    let audioCtx = null;
+
+    function playChiptune(type = 'blip') {
+      if (!soundOn) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        if (type === 'blip') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'scoop') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(520, now + 0.08);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'bellows') {
+          // Fire / wind whoosh
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(280, now + 0.12);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          osc.start(now);
+          osc.stop(now + 0.14);
+        } else if (type === 'blow') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.linearRampToValueAtTime(360, now + 0.08);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'ting') {
+          // Pure crystal glass chime
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1760, now);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else if (type === 'victory') {
+          // 8-bit fanfare arpeggio
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'square';
+            o.frequency.setValueAtTime(freq, now + i * 0.08);
+            g.gain.setValueAtTime(0.08, now + i * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.16);
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.start(now + i * 0.08);
+            o.stop(now + i * 0.08 + 0.16);
+          });
+          return;
+        }
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+      } catch (e) {}
+    }
+
+    // --- Game Progression & Orders Database ---
+    const orders = [
+      {
+        customer: "ALCHEMIST // ORDER #1",
+        item: "Clear Potion Flask",
+        shapeType: "flask",
+        oxide: "clear",
+        tintColor: "rgba(220, 235, 255, 0.75)",
+        glowColor: "#00f2fe",
+        reward: 50,
+        desc: "Wants a round spherical Potion Flask (Clear Glass)"
+      },
+      {
+        customer: "SORCERESS // ORDER #2",
+        item: "Ruby Elixir Vial",
+        shapeType: "vial",
+        oxide: "ruby",
+        tintColor: "rgba(255, 42, 122, 0.8)",
+        glowColor: "#ff2a7a",
+        reward: 90,
+        desc: "Requires a slim Ruby Red Elixir Vial with tapered neck"
+      },
+      {
+        customer: "TAVERN KEEPER // ORDER #3",
+        item: "Amber Beer Mug",
+        shapeType: "mug",
+        oxide: "amber",
+        tintColor: "rgba(246, 185, 59, 0.8)",
+        glowColor: "#f6b93b",
+        reward: 130,
+        desc: "Needs a sturdy flat-bottom Amber Glass Beer Stein"
+      },
+      {
+        customer: "ROYAL JEWELER // ORDER #4",
+        item: "Emerald Wine Goblet",
+        shapeType: "goblet",
+        oxide: "emerald",
+        tintColor: "rgba(0, 255, 136, 0.8)",
+        glowColor: "#00ff88",
+        reward: 180,
+        desc: "Demands a royal Emerald Goblet with wide flared rim"
+      },
+      {
+        customer: "ARCHMAGE // ORDER #5",
+        item: "Sapphire Crystal Sphere",
+        shapeType: "sphere",
+        oxide: "sapphire",
+        tintColor: "rgba(0, 168, 255, 0.85)",
+        glowColor: "#00a8ff",
+        reward: 250,
+        desc: "Craft a perfectly symmetrical Sapphire Scrying Orb"
+      }
+    ];
+
+    let currentOrderIndex = 0;
+    let goldCoins = 0;
+    const completedGallery = [];
+
+    // Stage Tracking: 1 = Batch, 2 = Smelt, 3 = Blow, 4 = Result
+    let currentStage = 1;
+
+    // Batch Recipe State
+    let silicaCount = 0;
+    let sodaCount = 0;
+    let limeCount = 0;
+
+    // Furnace Smelt State
+    let currentTemp = 750;
+    let inTargetZoneTime = 0;
+    let smeltInterval = null;
+
+    // Glassblowing State
+    let bubbleRadius = 24;
+    let neckWidth = 24;
+    let baseWidth = 32;
+    let glassHeat = 1450; // Molten cools down
+    let blowingActive = false;
+    let canvasAnimId = null;
+
+    // DOM Elements
+    const coinCountEl = document.getElementById('coinCount');
+    const orderCustomerEl = document.getElementById('orderCustomer');
+    const orderDescEl = document.getElementById('orderDesc');
+    const orderRewardEl = document.getElementById('orderReward');
+    const step1El = document.getElementById('step1');
+    const step2El = document.getElementById('step2');
+    const step3El = document.getElementById('step3');
+    const step4El = document.getElementById('step4');
+
+    // Viewports
+    const batchStageEl = document.getElementById('batchStage');
+    const furnaceStageEl = document.getElementById('furnaceStage');
+    const blowingStageEl = document.getElementById('blowingStage');
+    const resultStageEl = document.getElementById('resultStage');
+
+    // Batch UI
+    const countSilicaEl = document.getElementById('countSilica');
+    const countSodaEl = document.getElementById('countSoda');
+    const countLimeEl = document.getElementById('countLime');
+    const countOxideEl = document.getElementById('countOxide');
+    const oxideIconEl = document.getElementById('oxideIcon');
+    const oxideNameEl = document.getElementById('oxideName');
+    const crucibleFillEl = document.getElementById('crucibleFill');
+    const startSmeltBtn = document.getElementById('startSmeltBtn');
+
+    // Furnace UI
+    const tempReadingEl = document.getElementById('tempReading');
+    const tempFillEl = document.getElementById('tempFill');
+    const bellowsBtn = document.getElementById('bellowsBtn');
+    const meltStateEl = document.getElementById('meltState');
+    const furnaceGobEl = document.getElementById('furnaceGob');
+
+    // Canvas
+    const canvas = document.getElementById('glassCanvas');
+    const ctx = canvas.getContext('2d');
+    const blowBtn = document.getElementById('blowBtn');
+    const shapeBaseBtn = document.getElementById('shapeBaseBtn');
+    const shapeNeckBtn = document.getElementById('shapeNeckBtn');
+    const finishShapeBtn = document.getElementById('finishShapeBtn');
+
+    // Result UI
+    const gradeBadgeEl = document.getElementById('gradeBadge');
+    const resultPedestalEl = document.getElementById('resultPedestal');
+    const resCustomerEl = document.getElementById('resCustomer');
+    const resItemEl = document.getElementById('resItem');
+    const resAccuracyEl = document.getElementById('resAccuracy');
+    const resRewardEl = document.getElementById('resReward');
+    const nextOrderBtn = document.getElementById('nextOrderBtn');
+
+    // CRT & Sound Controls
+    const scanlines = document.getElementById('scanlines');
+    const crtToggleBtn = document.getElementById('crtToggleBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const galleryModal = document.getElementById('galleryModal');
+    const closeGalleryBtn = document.getElementById('closeGalleryBtn');
+    const galleryGrid = document.getElementById('galleryGrid');
+
+    // --- Order Setup ---
+    function loadOrder(index) {
+      const order = orders[index % orders.length];
+      orderCustomerEl.textContent = order.customer;
+      orderDescEl.textContent = order.desc;
+      orderRewardEl.textContent = `+${order.reward} G`;
+
+      // Set tint requirements
+      oxideNameEl.textContent = `${order.oxide.toUpperCase()} TINT`;
+      if (order.oxide === 'ruby') oxideIconEl.textContent = '🍷';
+      else if (order.oxide === 'emerald') oxideIconEl.textContent = '🍃';
+      else if (order.oxide === 'amber') oxideIconEl.textContent = '🍯';
+      else if (order.oxide === 'sapphire') oxideIconEl.textContent = '🔷';
+      else oxideIconEl.textContent = '💎';
+
+      resetBatch();
+      goToStage(1);
+    }
+
+    function goToStage(stage) {
+      currentStage = stage;
+      [batchStageEl, furnaceStageEl, blowingStageEl, resultStageEl].forEach(el => el.style.display = 'none');
+      [step1El, step2El, step3El, step4El].forEach(s => s.classList.remove('active', 'done'));
+
+      if (stage === 1) {
+        batchStageEl.style.display = 'flex';
+        step1El.classList.add('active');
+      } else if (stage === 2) {
+        furnaceStageEl.style.display = 'flex';
+        step1El.classList.add('done');
+        step2El.classList.add('active');
+        startSmelting();
+      } else if (stage === 3) {
+        blowingStageEl.style.display = 'flex';
+        step1El.classList.add('done');
+        step2El.classList.add('done');
+        step3El.classList.add('active');
+        startGlassblowing();
+      } else if (stage === 4) {
+        resultStageEl.style.display = 'flex';
+        step1El.classList.add('done');
+        step2El.classList.add('done');
+        step3El.classList.add('done');
+        step4El.classList.add('active');
+        evaluateCreation();
+      }
+    }
+
+    // --- STAGE 1: BATCH RECIPE LOGIC ---
+    function resetBatch() {
+      silicaCount = 0;
+      sodaCount = 0;
+      limeCount = 0;
+      countSilicaEl.textContent = '0 / 3';
+      countSodaEl.textContent = '0 / 2';
+      countLimeEl.textContent = '0 / 1';
+      countOxideEl.textContent = orders[currentOrderIndex % orders.length].oxide.toUpperCase();
+      crucibleFillEl.style.width = '0%';
+      startSmeltBtn.style.display = 'none';
+    }
+
+    document.querySelectorAll('.jar-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const mineral = card.dataset.mineral;
+        playChiptune('scoop');
+
+        if (mineral === 'silica' && silicaCount < 3) {
+          silicaCount++;
+          countSilicaEl.textContent = `${silicaCount} / 3`;
+        } else if (mineral === 'soda' && sodaCount < 2) {
+          sodaCount++;
+          countSodaEl.textContent = `${sodaCount} / 2`;
+        } else if (mineral === 'lime' && limeCount < 1) {
+          limeCount++;
+          countLimeEl.textContent = `${limeCount} / 1`;
+        } else if (mineral === 'oxide') {
+          playChiptune('ting');
+        }
+
+        const progress = ((silicaCount + sodaCount + limeCount) / 6) * 100;
+        crucibleFillEl.style.width = `${progress}%`;
+
+        if (silicaCount === 3 && sodaCount === 2 && limeCount === 1) {
+          startSmeltBtn.style.display = 'block';
+          playChiptune('blip');
+        }
+      });
+    });
+
+    startSmeltBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      goToStage(2);
+    });
+
+    // --- STAGE 2: FURNACE SMELT LOGIC ---
+    function startSmelting() {
+      currentTemp = 800;
+      inTargetZoneTime = 0;
+      meltStateEl.textContent = "HEATING CRUCIBLE...";
+
+      if (smeltInterval) clearInterval(smeltInterval);
+      smeltInterval = setInterval(() => {
+        // Natural heat loss
+        if (currentTemp > 600) {
+          currentTemp -= 10;
+        }
+
+        // Target zone is 1400°C - 1600°C (mapped to 65% - 90%)
+        const maxTemp = 2000;
+        const tempPct = Math.min(100, Math.max(0, (currentTemp / maxTemp) * 100));
+        tempFillEl.style.width = `${tempPct}%`;
+        tempReadingEl.textContent = `${Math.round(currentTemp)}°C`;
+
+        if (currentTemp >= 1400 && currentTemp <= 1650) {
+          inTargetZoneTime += 0.1;
+          meltStateEl.textContent = `MOLTEN ALCHEMY: ${Math.round(inTargetZoneTime * 25)}%`;
+          furnaceGobEl.style.transform = `scale(${1 + inTargetZoneTime * 0.15})`;
+
+          if (inTargetZoneTime >= 3.5) {
+            clearInterval(smeltInterval);
+            playChiptune('ting');
+            meltStateEl.textContent = "GATHERING MOLTEN GOB ON PIPE!";
+            setTimeout(() => {
+              goToStage(3);
+            }, 800);
+          }
+        } else if (currentTemp > 1650) {
+          meltStateEl.textContent = "WARNING: OVERHEATING!";
+        } else {
+          meltStateEl.textContent = "COLD! PUMP THE BELLOWS!";
+        }
+      }, 100);
+    }
+
+    function pumpBellows() {
+      playChiptune('bellows');
+      currentTemp += 95;
+      if (currentTemp > 1900) currentTemp = 1900;
+      bellowsBtn.style.transform = "scale(0.95)";
+      setTimeout(() => bellowsBtn.style.transform = "scale(1)", 100);
+    }
+
+    bellowsBtn.addEventListener('click', pumpBellows);
+
+    // --- STAGE 3: GLASSBLOWING CANVAS RENDERING ---
+    function startGlassblowing() {
+      bubbleRadius = 26;
+      neckWidth = 24;
+      baseWidth = 30;
+      glassHeat = 1450;
+      blowingActive = false;
+
+      if (canvasAnimId) cancelAnimationFrame(canvasAnimId);
+      renderGlassCanvas();
+    }
+
+    function renderGlassCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const order = orders[currentOrderIndex % orders.length];
+      const centerX = canvas.width / 2;
+      const pipeY = 40;
+      const bubbleCenterY = 150;
+
+      // Draw Target Silhouette (Dotted Outline)
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = order.glowColor;
+      ctx.lineWidth = 2;
+
+      let targetRadius = 60;
+      let targetNeck = 20;
+      let targetBase = 45;
+
+      if (order.shapeType === 'flask') {
+        targetRadius = 62;
+        targetNeck = 18;
+        targetBase = 40;
+      } else if (order.shapeType === 'vial') {
+        targetRadius = 42;
+        targetNeck = 14;
+        targetBase = 32;
+      } else if (order.shapeType === 'mug') {
+        targetRadius = 55;
+        targetNeck = 55;
+        targetBase = 65;
+      } else if (order.shapeType === 'goblet') {
+        targetRadius = 58;
+        targetNeck = 14;
+        targetBase = 50;
+      } else if (order.shapeType === 'sphere') {
+        targetRadius = 68;
+        targetNeck = 16;
+        targetBase = 16;
+      }
+
+      // Draw Silhouette
+      ctx.beginPath();
+      ctx.arc(centerX, bubbleCenterY, targetRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Neck guide
+      ctx.beginPath();
+      ctx.moveTo(centerX - targetNeck, pipeY + 40);
+      ctx.lineTo(centerX - targetNeck, bubbleCenterY - targetRadius * 0.7);
+      ctx.moveTo(centerX + targetNeck, pipeY + 40);
+      ctx.lineTo(centerX + targetNeck, bubbleCenterY - targetRadius * 0.7);
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw Blowpipe (Steel tube from top)
+      ctx.fillStyle = '#787596';
+      ctx.fillRect(centerX - 6, pipeY, 12, 50);
+      ctx.fillStyle = '#b0adc9';
+      ctx.fillRect(centerX - 4, pipeY, 3, 50);
+
+      // Gradual heat cooldown
+      if (glassHeat > 600) {
+        glassHeat -= 0.5;
+      }
+
+      // Glass color interpolates from Molten Yellow-Orange (hot) to Target Tint (cool)
+      const heatFactor = (glassHeat - 600) / 850; // 1 = molten, 0 = cooled
+      let glassFill;
+      if (heatFactor > 0.4) {
+        glassFill = `rgba(255, ${Math.round(140 + heatFactor * 100)}, 40, 0.85)`;
+      } else {
+        glassFill = order.tintColor;
+      }
+
+      // Draw Active Blown Glass Bubble
+      ctx.save();
+      ctx.fillStyle = glassFill;
+      ctx.strokeStyle = order.glowColor;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = order.glowColor;
+      ctx.shadowBlur = heatFactor > 0.3 ? 25 : 8;
+
+      ctx.beginPath();
+      // Vessel neck & body path
+      ctx.moveTo(centerX - neckWidth, pipeY + 50);
+      ctx.lineTo(centerX - neckWidth, bubbleCenterY - bubbleRadius * 0.6);
+      ctx.bezierCurveTo(
+        centerX - bubbleRadius * 1.15, bubbleCenterY - bubbleRadius * 0.4,
+        centerX - baseWidth, bubbleCenterY + bubbleRadius,
+        centerX, bubbleCenterY + bubbleRadius
+      );
+      ctx.bezierCurveTo(
+        centerX + baseWidth, bubbleCenterY + bubbleRadius,
+        centerX + bubbleRadius * 1.15, bubbleCenterY - bubbleRadius * 0.4,
+        centerX + neckWidth, bubbleCenterY - bubbleRadius * 0.6
+      );
+      ctx.lineTo(centerX + neckWidth, pipeY + 50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Glass shine highlight
+      ctx.beginPath();
+      ctx.ellipse(centerX - bubbleRadius * 0.45, bubbleCenterY - bubbleRadius * 0.3, bubbleRadius * 0.18, bubbleRadius * 0.4, -0.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fill();
+      ctx.restore();
+
+      // If user is holding blow button
+      if (blowingActive && glassHeat > 650) {
+        bubbleRadius += 0.45;
+        playChiptune('blow');
+        if (bubbleRadius > 85) {
+          bubbleRadius = 85; // Max limit before warning
+        }
+      }
+
+      // Draw Temperature & Accuracy HUD in Canvas
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.fillText(`GLASS TEMP: ${Math.round(glassHeat)}°C`, 14, 26);
+
+      const targetAccuracy = Math.max(0, 100 - Math.abs(bubbleRadius - targetRadius) * 2.5);
+      ctx.fillStyle = targetAccuracy > 80 ? '#00ff88' : '#f6b93b';
+      ctx.fillText(`FIT: ${Math.round(targetAccuracy)}%`, canvas.width - 120, 26);
+
+      canvasAnimId = requestAnimationFrame(renderGlassCanvas);
+    }
+
+    // Glassblowing Interaction Handlers
+    function startBlowing() {
+      blowingActive = true;
+      blowBtn.classList.add('active');
+    }
+
+    function stopBlowing() {
+      blowingActive = false;
+      blowBtn.classList.remove('active');
+    }
+
+    blowBtn.addEventListener('mousedown', startBlowing);
+    blowBtn.addEventListener('mouseup', stopBlowing);
+    blowBtn.addEventListener('mouseleave', stopBlowing);
+    blowBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startBlowing(); });
+    blowBtn.addEventListener('touchend', stopBlowing);
+
+    shapeBaseBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      baseWidth = Math.min(75, baseWidth + 8);
+    });
+
+    shapeNeckBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      neckWidth = Math.max(10, neckWidth - 4);
+    });
+
+    finishShapeBtn.addEventListener('click', () => {
+      if (canvasAnimId) cancelAnimationFrame(canvasAnimId);
+      playChiptune('ting');
+      goToStage(4);
+    });
+
+    // Keyboard Shortcuts for Game
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (currentStage === 2) {
+          pumpBellows();
+        } else if (currentStage === 3) {
+          startBlowing();
+        }
+      } else if (e.code === 'KeyS' && currentStage === 3) {
+        shapeBaseBtn.click();
+      } else if (e.code === 'KeyW' && currentStage === 3) {
+        shapeNeckBtn.click();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space' && currentStage === 3) {
+        stopBlowing();
+      }
+    });
+
+    // --- STAGE 4: ANNEALING EVALUATION ---
+    function evaluateCreation() {
+      const order = orders[currentOrderIndex % orders.length];
+      playChiptune('victory');
+
+      let targetRadius = 60;
+      if (order.shapeType === 'vial') targetRadius = 42;
+      if (order.shapeType === 'mug') targetRadius = 55;
+      if (order.shapeType === 'goblet') targetRadius = 58;
+      if (order.shapeType === 'sphere') targetRadius = 68;
+
+      const accuracy = Math.max(45, Math.round(100 - Math.abs(bubbleRadius - targetRadius) * 2.2));
+      let rank = 'RANK S';
+      let multiplier = 1.2;
+
+      if (accuracy < 70) {
+        rank = 'RANK C';
+        multiplier = 0.7;
+      } else if (accuracy < 85) {
+        rank = 'RANK B';
+        multiplier = 0.9;
+      } else if (accuracy < 94) {
+        rank = 'RANK A';
+        multiplier = 1.0;
+      }
+
+      const totalGold = Math.round(order.reward * multiplier);
+      goldCoins += totalGold;
+      coinCountEl.textContent = goldCoins;
+
+      gradeBadgeEl.textContent = rank;
+      resCustomerEl.textContent = order.customer.split('//')[0].trim();
+      resItemEl.textContent = order.item;
+      resAccuracyEl.textContent = `${accuracy}%`;
+      resRewardEl.textContent = `+${totalGold} G`;
+
+      // Render trophy SVG preview
+      resultPedestalEl.innerHTML = generateGlassSVG(order, accuracy);
+
+      // Save to Trophy Gallery
+      completedGallery.push({
+        item: order.item,
+        rank: rank,
+        color: order.glowColor,
+        svg: generateGlassSVG(order, accuracy, 70, 70)
+      });
+      updateGalleryUI();
+    }
+
+    function generateGlassSVG(order, accuracy, w = 120, h = 130) {
+      return `
+        <svg class="glass-showcase-svg" width="${w}" height="${h}" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M42 15 H58 V40 C75 50 82 75 74 95 C68 102 32 102 26 95 C18 75 25 50 42 40 Z" fill="${order.tintColor}" stroke="${order.glowColor}" stroke-width="3"/>
+          <ellipse cx="38" cy="65" rx="8" ry="16" transform="rotate(-20 38 65)" fill="rgba(255,255,255,0.45)"/>
+        </svg>
+      `;
+    }
+
+    nextOrderBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      currentOrderIndex++;
+      loadOrder(currentOrderIndex);
+    });
+
+    // --- GALLERY MODAL ---
+    function updateGalleryUI() {
+      galleryGrid.innerHTML = '';
+      completedGallery.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'gallery-card';
+        card.innerHTML = `
+          ${item.svg}
+          <span style="color: ${item.color};">${item.item}</span>
+          <span style="color: var(--gold);">${item.rank}</span>
+        `;
+        galleryGrid.appendChild(card);
+      });
+    }
+
+    galleryBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      galleryModal.classList.add('open');
+    });
+
+    closeGalleryBtn.addEventListener('click', () => {
+      playChiptune('blip');
+      galleryModal.classList.remove('open');
+    });
+
+    // --- CRT Scanlines & Sound Toggles ---
+    crtToggleBtn.addEventListener('click', () => {
+      scanlines.classList.toggle('off');
+      const isOff = scanlines.classList.contains('off');
+      crtToggleBtn.textContent = isOff ? 'CRT: OFF' : 'CRT: ON';
+      playChiptune('blip');
+    });
+
+    soundToggleBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      soundToggleBtn.textContent = soundOn ? '🔊' : '🔇';
+      if (soundOn) playChiptune('blip');
+    });
+
+    // Boot initial order
+    loadOrder(0);
+  </script>
+</body>
+</html>
+
